@@ -2,95 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 330 20% 98%;
+    --foreground: 330 40% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 330 25% 97%;
+    --card-foreground: 330 40% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 330 25% 97%;
+    --popover-foreground: 330 40% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 340 75% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 280 30% 92%;
+    --secondary-foreground: 280 40% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 330 15% 93%;
+    --muted-foreground: 330 10% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 280 50% 88%;
+    --accent-foreground: 280 50% 25%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 330 20% 90%;
+    --input: 330 20% 88%;
+    --ring: 340 75% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --love-pink: 340 75% 55%;
+    --love-rose: 350 80% 65%;
+    --love-blush: 330 50% 90%;
+    --love-lavender: 280 40% 80%;
+    --love-purple: 280 60% 55%;
+    --love-neon: 340 100% 65%;
+    --love-gold: 40 80% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 330 20% 96%;
+    --sidebar-foreground: 330 30% 20%;
+    --sidebar-primary: 340 75% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 280 30% 92%;
+    --sidebar-accent-foreground: 280 40% 25%;
+    --sidebar-border: 330 20% 90%;
+    --sidebar-ring: 340 75% 55%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 280 30% 6%;
+    --foreground: 330 20% 92%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 280 25% 9%;
+    --card-foreground: 330 20% 92%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 280 25% 9%;
+    --popover-foreground: 330 20% 92%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 340 80% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 280 30% 15%;
+    --secondary-foreground: 280 20% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 280 20% 14%;
+    --muted-foreground: 330 10% 55%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 280 40% 18%;
+    --accent-foreground: 280 20% 85%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --border: 280 20% 15%;
+    --input: 280 20% 15%;
+    --ring: 340 80% 60%;
+
+    --love-pink: 340 80% 60%;
+    --love-rose: 350 85% 70%;
+    --love-blush: 330 30% 20%;
+    --love-lavender: 280 30% 35%;
+    --love-purple: 280 60% 60%;
+    --love-neon: 340 100% 70%;
+    --love-gold: 40 80% 60%;
+
+    --sidebar-background: 280 25% 8%;
+    --sidebar-foreground: 330 15% 85%;
+    --sidebar-primary: 340 80% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 280 30% 15%;
+    --sidebar-accent-foreground: 280 20% 85%;
+    --sidebar-border: 280 20% 15%;
+    --sidebar-ring: 340 80% 60%;
+  }
+
+  .pink {
+    --background: 340 40% 95%;
+    --foreground: 340 50% 15%;
+
+    --card: 340 50% 93%;
+    --card-foreground: 340 50% 15%;
+
+    --popover: 340 50% 93%;
+    --popover-foreground: 340 50% 15%;
+
+    --primary: 340 85% 50%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 60% 88%;
+    --secondary-foreground: 340 50% 20%;
+
+    --muted: 340 30% 90%;
+    --muted-foreground: 340 20% 40%;
+
+    --accent: 350 60% 85%;
+    --accent-foreground: 340 60% 20%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 340 35% 88%;
+    --input: 340 35% 85%;
+    --ring: 340 85% 50%;
+
+    --love-pink: 340 85% 50%;
+    --love-rose: 350 90% 60%;
+    --love-blush: 330 60% 88%;
+    --love-lavender: 300 40% 80%;
+    --love-purple: 300 60% 50%;
+    --love-neon: 340 100% 60%;
+    --love-gold: 40 90% 50%;
+
+    --sidebar-background: 340 45% 93%;
+    --sidebar-foreground: 340 40% 20%;
+    --sidebar-primary: 340 85% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 330 60% 88%;
+    --sidebar-accent-foreground: 340 50% 20%;
+    --sidebar-border: 340 35% 88%;
+    --sidebar-ring: 340 85% 50%;
   }
 }
 
@@ -100,6 +155,35 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body antialiased;
+  }
+}
+
+@layer utilities {
+  .gradient-love {
+    background: linear-gradient(135deg, hsl(var(--love-pink)), hsl(var(--love-purple)));
+  }
+  .gradient-love-soft {
+    background: linear-gradient(135deg, hsl(var(--love-blush)), hsl(var(--love-lavender)));
+  }
+  .gradient-neon {
+    background: linear-gradient(135deg, hsl(var(--love-neon)), hsl(var(--love-purple)));
+  }
+  .text-gradient-love {
+    background: linear-gradient(135deg, hsl(var(--love-pink)), hsl(var(--love-purple)));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .shadow-love {
+    box-shadow: 0 4px 30px -5px hsl(var(--love-pink) / 0.3);
+  }
+  .shadow-neon {
+    box-shadow: 0 0 20px hsl(var(--love-neon) / 0.4), 0 0 60px hsl(var(--love-neon) / 0.1);
+  }
+  .glass {
+    backdrop-filter: blur(16px) saturate(180%);
+    background: hsl(var(--card) / 0.7);
+    border: 1px solid hsl(var(--border) / 0.5);
   }
 }
