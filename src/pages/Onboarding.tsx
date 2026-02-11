@@ -141,7 +141,7 @@ const Onboarding = () => {
     if (error) {
       toast({ title: "Error saving profile", description: error.message, variant: "destructive" });
     } else {
-      navigate("/");
+      navigate("/avatar");
     }
     setSaving(false);
   };
