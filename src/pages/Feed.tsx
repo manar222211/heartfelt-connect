@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, MessageCircle, Bookmark, Flag, Send, Ghost, Smile, ImageIcon, X } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, Flag, Send, Ghost, Pencil, Trash2, X, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,7 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AvatarDisplay, AvatarConfig } from "@/components/AvatarDisplay";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 
 interface Post {
@@ -26,8 +26,6 @@ interface Post {
   user_saved: boolean;
 }
 
-const REACTIONS = ["❤️", "😂", "🔥", "😍", "👏", "😢"];
-
 const Feed = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -41,6 +39,8 @@ const Feed = () => {
   const [comments, setComments] = useState<any[]>([]);
   const [reportingPost, setReportingPost] = useState<string | null>(null);
   const [reportReason, setReportReason] = useState("");
+  const [editingPost, setEditingPost] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState("");
 
   const fetchPosts = async () => {
     const { data: postsData, error } = await supabase
@@ -55,18 +55,13 @@ const Feed = () => {
       return;
     }
 
-    // Fetch profiles for non-anonymous posts
     const userIds = [...new Set((postsData || []).filter((p) => !p.is_anonymous).map((p) => p.user_id))];
     let profilesMap: Record<string, any> = {};
-    if (userIds.length > 0) {
-      // We can only fetch our own profile due to RLS, so we'll handle display differently
-      if (user) {
-        const { data: myProfile } = await supabase.from("profiles").select("display_name, avatar_config").eq("user_id", user.id).maybeSingle();
-        if (myProfile) profilesMap[user.id] = myProfile;
-      }
+    if (userIds.length > 0 && user) {
+      const { data: myProfile } = await supabase.from("profiles").select("display_name, avatar_config").eq("user_id", user.id).maybeSingle();
+      if (myProfile) profilesMap[user.id] = myProfile;
     }
 
-    // Fetch reactions counts
     const postIds = (postsData || []).map((p) => p.id);
     const { data: reactions } = await supabase.from("post_reactions").select("post_id, user_id").in("post_id", postIds.length > 0 ? postIds : ["none"]);
     const { data: commentsCounts } = await supabase.from("comments").select("post_id").in("post_id", postIds.length > 0 ? postIds : ["none"]);
@@ -108,6 +103,34 @@ const Feed = () => {
       fetchPosts();
     }
     setPosting(false);
+  };
+
+  const deletePost = async (postId: string) => {
+    const { error } = await supabase.from("posts").delete().eq("id", postId);
+    if (error) {
+      toast({ title: "Error deleting post", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Post deleted 🗑️" });
+      fetchPosts();
+    }
+  };
+
+  const startEdit = (post: Post) => {
+    setEditingPost(post.id);
+    setEditContent(post.content || "");
+  };
+
+  const saveEdit = async () => {
+    if (!editingPost || !editContent.trim()) return;
+    const { error } = await supabase.from("posts").update({ content: editContent.trim() }).eq("id", editingPost);
+    if (error) {
+      toast({ title: "Error updating post", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Post updated ✏️" });
+      setEditingPost(null);
+      setEditContent("");
+      fetchPosts();
+    }
   };
 
   const toggleReaction = async (postId: string, reacted: boolean) => {
@@ -207,64 +230,109 @@ const Feed = () => {
         </div>
       ) : (
         <AnimatePresence>
-          {posts.map((post) => (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-            >
-              <Card className="glass border-0">
-                <CardContent className="pt-4 pb-3">
-                  {/* Header */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <AvatarDisplay
-                      config={post.is_anonymous ? null : post.profile?.avatar_config}
-                      size="sm"
-                      blurred={post.is_anonymous}
-                    />
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-foreground">
-                        {post.is_anonymous ? "Anonymous 🤫" : post.profile?.display_name || "LoveVerse User"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">{timeAgo(post.created_at)} ago</p>
+          {posts.map((post) => {
+            const isOwner = user?.id === post.user_id;
+            const isEditing = editingPost === post.id;
+
+            return (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Card className="glass border-0">
+                  <CardContent className="pt-4 pb-3">
+                    {/* Header */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <AvatarDisplay
+                        config={post.is_anonymous ? null : post.profile?.avatar_config}
+                        size="sm"
+                        blurred={post.is_anonymous}
+                      />
+                      <div className="flex-1">
+                        <p className="font-medium text-sm text-foreground">
+                          {post.is_anonymous ? "Anonymous 🤫" : post.profile?.display_name || "LoveVerse User"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{timeAgo(post.created_at)} ago</p>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {isOwner && (
+                          <>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-primary"
+                              onClick={() => startEdit(post)}
+                            >
+                              <Pencil className="h-3.5 w-3.5" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                              onClick={() => deletePost(post.id)}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                          </>
+                        )}
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setReportingPost(post.id)}>
+                          <Flag className="h-3.5 w-3.5 text-muted-foreground" />
+                        </Button>
+                      </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setReportingPost(post.id)}>
-                      <Flag className="h-3.5 w-3.5 text-muted-foreground" />
-                    </Button>
-                  </div>
 
-                  {/* Content */}
-                  <p className="text-foreground text-sm whitespace-pre-wrap mb-3">{post.content}</p>
+                    {/* Content or Edit mode */}
+                    {isEditing ? (
+                      <div className="space-y-2 mb-3">
+                        <Textarea
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          className="min-h-[60px] resize-none"
+                        />
+                        <div className="flex gap-2 justify-end">
+                          <Button size="sm" variant="ghost" onClick={() => setEditingPost(null)}>
+                            <X className="h-4 w-4 mr-1" /> Cancel
+                          </Button>
+                          <Button size="sm" className="gradient-love text-primary-foreground" onClick={saveEdit}>
+                            <Check className="h-4 w-4 mr-1" /> Save
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-foreground text-sm whitespace-pre-wrap mb-3">{post.content}</p>
+                    )}
 
-                  {/* Actions */}
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleReaction(post.id, post.user_reacted)}
-                      className={post.user_reacted ? "text-love-pink" : "text-muted-foreground"}
-                    >
-                      <Heart className={`h-4 w-4 mr-1 ${post.user_reacted ? "fill-current" : ""}`} />
-                      {post.reactions_count > 0 && post.reactions_count}
-                    </Button>
-                    <Button variant="ghost" size="sm" onClick={() => loadComments(post.id)} className="text-muted-foreground">
-                      <MessageCircle className="h-4 w-4 mr-1" />
-                      {post.comments_count > 0 && post.comments_count}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => toggleSave(post.id, post.user_saved)}
-                      className={post.user_saved ? "text-love-gold" : "text-muted-foreground"}
-                    >
-                      <Bookmark className={`h-4 w-4 ${post.user_saved ? "fill-current" : ""}`} />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                    {/* Actions */}
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleReaction(post.id, post.user_reacted)}
+                        className={post.user_reacted ? "text-love-pink" : "text-muted-foreground"}
+                      >
+                        <Heart className={`h-4 w-4 mr-1 ${post.user_reacted ? "fill-current" : ""}`} />
+                        {post.reactions_count > 0 && post.reactions_count}
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => loadComments(post.id)} className="text-muted-foreground">
+                        <MessageCircle className="h-4 w-4 mr-1" />
+                        {post.comments_count > 0 && post.comments_count}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => toggleSave(post.id, post.user_saved)}
+                        className={post.user_saved ? "text-love-gold" : "text-muted-foreground"}
+                      >
+                        <Bookmark className={`h-4 w-4 ${post.user_saved ? "fill-current" : ""}`} />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       )}
 

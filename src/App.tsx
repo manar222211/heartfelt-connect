@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
+import Welcome from "./pages/Welcome";
 import Auth from "./pages/Auth";
 import Onboarding from "./pages/Onboarding";
 import AvatarCreator from "./pages/AvatarCreator";
@@ -64,10 +65,11 @@ const App = () => (
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route path="/welcome" element={<Welcome />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/onboarding" element={<Onboarding />} />
               <Route path="/avatar" element={<AvatarCreator />} />
-              <Route path="/" element={<Navigate to="/feed" replace />} />
+              <Route path="/" element={<Navigate to="/welcome" replace />} />
               <Route
                 element={
                   <ProtectedRoute>
